@@ -1,0 +1,166 @@
+{
+	"": {
+		"commonTypes": {
+			"TransactionContext": {
+				"type": "Record",
+				"attributes": {
+					"network": {
+						"type": "Entity",
+						"name": "Network",
+						"required": true
+					},
+					"value": {
+						"type": "Extension",
+						"name": "u256",
+						"required": true
+					},
+					"data": {
+						"type": "String",
+						"required": true
+					},
+					"gasLimit": {
+						"type": "Extension",
+						"name": "u256"
+					},
+					"threatModuleResult": {
+						"type": "Boolean"
+					},
+					"aiModelResult": {
+						"type": "Boolean"
+					}
+				}
+			}
+		},
+		"entityTypes": {
+			"Address": {
+				"shape": {
+					"type": "Record",
+					"attributes": {
+						"balance": {
+							"type": "Extension",
+							"name": "u256"
+						},
+						"history": {
+							"type": "Set",
+							"element": {
+								"type": "Entity",
+								"name": "Address"
+							}
+						},
+						"groups": {
+							"type": "Set",
+							"element": {
+								"type": "Entity",
+								"name": "Group"
+							}
+						},
+						"tags": {
+							"type": "Set",
+							"element": {
+								"type": "String"
+							}
+						}
+					}
+				}
+			},
+			"Network": {
+				"shape": {
+					"type": "Record",
+					"attributes": {
+						"blockNumber": {
+							"type": "Long"
+						}
+					}
+				}
+			},
+			"Group": {
+				"shape": {
+					"type": "Record",
+					"attributes": {
+						"groupName": {
+							"type": "String"
+						}
+					}
+				}
+			}
+		},
+		"actions": {
+			"eoa": {
+				"appliesTo": {
+					"principalTypes": [
+						"Address"
+					],
+					"resourceTypes": [
+						"Address"
+					],
+					"context": {
+						"type": "Record",
+						"attributes": {
+							"transaction": {
+								"type": "TransactionContext",
+								"required": true
+							}
+						}
+					}
+				}
+			},
+			"contract": {
+				"appliesTo": {
+					"principalTypes": [
+						"Address"
+					],
+					"resourceTypes": [
+						"Address"
+					],
+					"context": {
+						"type": "Record",
+						"attributes": {
+							"transaction": {
+								"type": "TransactionContext",
+								"required": true
+							}
+						}
+					}
+				}
+			},
+			"contract_creation": {
+				"appliesTo": {
+					"principalTypes": [
+						"Address"
+					],
+					"resourceTypes": [
+						"Address"
+					],
+					"context": {
+						"type": "Record",
+						"attributes": {
+							"transaction": {
+								"type": "TransactionContext",
+								"required": true
+							}
+						}
+					}
+				}
+			},
+			"unknown": {
+				"appliesTo": {
+					"principalTypes": [
+						"Address"
+					],
+					"resourceTypes": [
+						"Address"
+					],
+					"context": {
+						"type": "Record",
+						"attributes": {
+							"transaction": {
+								"type": "TransactionContext",
+								"required": true
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

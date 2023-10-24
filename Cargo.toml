@@ -1,0 +1,21 @@
+[package]
+name = "banyan_nodejs"
+version = "0.1.0"
+license = "ISC"
+edition = "2018"
+exclude = ["index.node"]
+
+[lib]
+crate-type = ["cdylib"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+cedar-policy = { git = "https://github.com/ipatka/banyan.git", branch = "ethers" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[dependencies.neon]
+version = "0.10"
+default-features = false
+features = ["napi-6"]
