@@ -1,4 +1,4 @@
-name: package and publish to pypi and npm
+name: package and publish to npm
 
 on:
   push:
@@ -115,7 +115,7 @@ jobs:
       - name: Build native
         working-directory: ./
         run: npm run release-native
-      - name: Pacakge the asset
+      - name: Package the asset
         working-directory: ./
         # This will make a node-pre-gyp package.
         run: npx node-pre-gyp package
