@@ -79,10 +79,10 @@ jobs:
         system:
           - os: macos-11
             target: x86_64-apple-darwin
-          - os: ubuntu-20.04
-            target: x86_64-unknown-linux-gnu
           # - os: ubuntu-20.04
-          #   target: aarch64-unknown-linux-gnu
+          #   target: x86_64-unknown-linux-gnu
+          - os: ubuntu-20.04
+            target: x86_64-unknown-linux-musl
           - os: windows-2022
             target: x86_64-pc-windows-msvc
           # Would like to have aarch64 support, but actions does not provide these yet.
@@ -138,6 +138,8 @@ jobs:
       - name: Build native
         working-directory: ./
         run: npm run release-native
+        env:
+          RUSTFLAGS: "-C target-feature=-crt-static"
       - name: Package the asset
         working-directory: ./
         # This will make a node-pre-gyp package.
