@@ -183,7 +183,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: Install modules
         working-directory: ./
-        run: npm i
+        run: pnpm install
       - name: Tweak package.json
         working-directory: ./
         # This will update the package version to tag version. So artifacts uploaded to Github release will be named correctly.
@@ -209,26 +209,27 @@ jobs:
       #   with:	
       #     path: target	
       #     key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.toml') }}
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          target: ${{ matrix.system.target }}
-          override: true
+      # - name: Install Rust
+      #   uses: actions-rs/toolchain@v1
+      #   with:
+      #     profile: minimal
+      #     toolchain: stable
+      #     target: ${{ matrix.system.target }}
+      #     override: true
       #   env:
       #     CARGO_HOME: /github/workspace/.cargo
       #     RUSTUP_HOME: /github/workspace/.rustup
-      # - name: Install Rust
-      #   run: |
-      #     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-      #     echo "/tmp/.cargo/bin" >> $GITHUB_PATH
+      - name: Install Rust
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          echo "/github/workspace/.cargo/bin" >> $GITHUB_PATH
+          # echo "/root/.cargo/bin" >> $GITHUB_PATH
         # env:
         #   CARGO_HOME: /tmp/.cargo
         #   RUSTUP_HOME: /tmp/.rustup
 
-      # - name: Install Rust toolchain
-      #   run: rustup default stable
+      - name: Install Rust toolchain
+        run: rustup default stable
         # env:
         #   CARGO_HOME: /tmp/.cargo
         #   RUSTUP_HOME: /tmp/.rustup
@@ -252,7 +253,7 @@ jobs:
 
       - name: Build native
         working-directory: ./
-        run: npm run release-native
+        run: pnpm run release-native
         # env:
         #   CARGO_HOME: /tmp/.cargo
         #   RUSTUP_HOME: /tmp/.rustup
