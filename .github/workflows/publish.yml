@@ -228,39 +228,38 @@ jobs:
       - name: Install Rust
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          echo "/github/workspace/.cargo/bin" >> $GITHUB_PATH
-          # echo "/root/.cargo/bin" >> $GITHUB_PATH
-          # echo "/root/.rustup/bin" >> $GITHUB_PATH
+          echo "$CARGO_HOME/bin" >> $GITHUB_PATH
+          echo "$RUSTUP_HOME/bin" >> $GITHUB_PATH
         env:
-          CARGO_HOME: /github/workspace/.cargo
-          RUSTUP_HOME: /github/workspace/.rustup
+          CARGO_HOME: /__w/.cargo
+          RUSTUP_HOME: /__w/.rustup
 
-      - name: Change permissions
-        run: chmod -R 777 /github/workspace
+      # - name: Change permissions
+      #   run: chmod -R 777 /github/workspace
 
       - name: Check Rust
         run: |
           cargo --version
           rustup --version
         env:
-          CARGO_HOME: /github/workspace/.cargo
-          RUSTUP_HOME: /github/workspace/.rustup
+          CARGO_HOME: /__w/.cargo
+          RUSTUP_HOME: /__w/.rustup
 
       - name: Install Rust toolchain
         run: rustup default stable
         env:
-          CARGO_HOME: /github/workspace/.cargo
-          RUSTUP_HOME: /github/workspace/.rustup
+          CARGO_HOME: /__w/.cargo
+          RUSTUP_HOME: /__w/.rustup
         # env:
         #   CARGO_HOME: /tmp/.cargo
         #   RUSTUP_HOME: /tmp/.rustup
       - name: Print current user
         run: whoami
     
-      - name: Change owner of CARGO_HOME
-        run: sudo chown -R runner $CARGO_HOME
-        env:
-          CARGO_HOME: /github/workspace/.cargo
+      # - name: Change owner of CARGO_HOME
+      #   run: sudo chown -R runner $CARGO_HOME
+      #   env:
+      #     CARGO_HOME: /github/workspace/.cargo
   
       # - name: Check CARGO_HOME permissions
       #   run: ls -la $CARGO_HOME
@@ -277,8 +276,8 @@ jobs:
           # RUSTFLAGS: "-C target-feature=-crt-static"
           RUST_LOG: debug
           RUST_BACKTRACE: 1
-          CARGO_HOME: /github/workspace/.cargo
-          RUSTUP_HOME: /github/workspace/.rustup
+          CARGO_HOME: /__w/.cargo
+          RUSTUP_HOME: /__w/.rustup
       - name: Package the asset
         working-directory: ./
         # This will make a node-pre-gyp package.
