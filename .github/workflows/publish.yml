@@ -240,6 +240,11 @@ jobs:
         # env:
         #   CARGO_HOME: /tmp/.cargo
         #   RUSTUP_HOME: /tmp/.rustup
+      - name: Change owner of CARGO_HOME
+        run: sudo chown -R $(whoami) $CARGO_HOME
+        env:
+          CARGO_HOME: /github/home/.cargo
+  
       - name: Check CARGO_HOME permissions
         run: ls -la $CARGO_HOME
         env:
