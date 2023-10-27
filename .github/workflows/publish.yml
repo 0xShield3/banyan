@@ -224,9 +224,15 @@ jobs:
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
           # echo "/github/workspace/.cargo/bin" >> $GITHUB_PATH
           echo "/root/.cargo/bin" >> $GITHUB_PATH
+          echo "/root/.rustup/bin" >> $GITHUB_PATH
         # env:
         #   CARGO_HOME: /tmp/.cargo
         #   RUSTUP_HOME: /tmp/.rustup
+
+      - name: Check Rust
+        run: |
+          rustup --version
+          cargo --version
 
       - name: Install Rust toolchain
         run: rustup default stable
@@ -234,13 +240,6 @@ jobs:
         #   CARGO_HOME: /tmp/.cargo
         #   RUSTUP_HOME: /tmp/.rustup
     
-      - name: Check Rust
-        run: |
-          rustup --version
-          cargo --version
-        # env:
-        #   CARGO_HOME: /tmp/.cargo
-        #   RUSTUP_HOME: /tmp/.rustup
       # - name: Change owner of CARGO_HOME
       #   run: sudo chown -R $(whoami) $CARGO_HOME
       #   env:
