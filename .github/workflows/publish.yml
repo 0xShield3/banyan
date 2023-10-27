@@ -240,14 +240,6 @@ jobs:
       # - name: Change permissions
       #   run: chmod -R 777 /github/workspace
 
-      - name: Check Rust
-        run: |
-          cargo --version
-          rustup --version
-        # env:
-        #   CARGO_HOME: /__w/.cargo
-        #   RUSTUP_HOME: /__w/.rustup
-
       - name: Install Rust toolchain
         run: rustup default stable
         # env:
@@ -256,6 +248,15 @@ jobs:
         # env:
         #   CARGO_HOME: /tmp/.cargo
         #   RUSTUP_HOME: /tmp/.rustup
+
+      - name: Check Rust
+        run: |
+          cargo --version
+          rustup --version
+        # env:
+        #   CARGO_HOME: /__w/.cargo
+        #   RUSTUP_HOME: /__w/.rustup
+
     
       # - name: Change owner of CARGO_HOME
       #   run: sudo chown -R runner $CARGO_HOME
