@@ -209,21 +209,18 @@ jobs:
         with:	
           path: target	
           key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.toml') }}
-      # - uses: actions-rs/toolchain@v1
-      #   with:
-      #     profile: minimal
-      #     toolchain: stable
-      #     target: ${{ matrix.system.target }}
-      #     override: true
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          target: ${{ matrix.system.target }}
+          override: true
+        env:
+          CARGO_HOME: /root/.cargo
+          RUSTUP_HOME: /root/.rustup
       # - name: Install rust target
       #   run: rustup component add ${{ matrix.system.target }}
-      - name: Check cargo path and permissions
-        run: |
-          which cargo
-          ls -l $(which cargo)
-
-      - name: Set cargo permissions
-        run: chmod +x $(which cargo)
 
       - name: Build native
         working-directory: ./
