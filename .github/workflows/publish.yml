@@ -226,6 +226,9 @@ jobs:
         env:
           CARGO_HOME: /github/workspace/.cargo
           RUSTUP_HOME: /github/workspace/.rustup
+
+      - name: Install Rust toolchain
+        run: rustup default stable
     
       - name: Check Rust
         run: |
