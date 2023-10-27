@@ -169,6 +169,8 @@ jobs:
           - os: ubuntu-20.04
             target: x86_64-unknown-linux-gnu
     steps:
+      - name: Change permissions
+        run: chmod -R 777 /github/workspace
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.release.tag_name }}
