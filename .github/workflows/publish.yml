@@ -271,12 +271,10 @@ jobs:
 
       - name: Build native
         working-directory: ./
-        run: pnpm run release-native
-        # env:
-        #   CARGO_HOME: /tmp/.cargo
-        #   RUSTUP_HOME: /tmp/.rustup
+        run: |
+          whoami
+          pnpm run release-native
         env:
-          # RUSTFLAGS: "-C target-feature=-crt-static"
           RUST_LOG: debug
           RUST_BACKTRACE: 1
           CARGO_HOME: /__w/.cargo
