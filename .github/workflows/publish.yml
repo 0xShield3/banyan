@@ -224,8 +224,8 @@ jobs:
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
           echo "/github/workspace/.cargo/bin" >> $GITHUB_PATH
         env:
-          CARGO_HOME: /github/workspace/.cargo
-          RUSTUP_HOME: /github/workspace/.rustup
+          CARGO_HOME: /tmp/.cargo
+          RUSTUP_HOME: /tmp/.rustup
 
       - name: Install Rust toolchain
         run: rustup default stable
@@ -237,10 +237,10 @@ jobs:
 
       - name: Build native
         working-directory: ./
-        run: sudo npm run release-native
+        run: npm run release-native
         env:
-          CARGO_HOME: /github/workspace/.cargo
-          RUSTUP_HOME: /github/workspace/.rustup
+          CARGO_HOME: /tmp/.cargo
+          RUSTUP_HOME: /tmp/.rustup
         # env:
         #   RUSTFLAGS: "-C target-feature=-crt-static"
       - name: Package the asset
