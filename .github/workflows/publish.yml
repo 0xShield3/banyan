@@ -169,8 +169,8 @@ jobs:
           - os: ubuntu-20.04
             target: x86_64-unknown-linux-gnu
     steps:
-      - name: Change permissions
-        run: chmod -R 777 /github/workspace
+      - name: Print current dir 1
+        run: pwd
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.event.release.tag_name }}
@@ -183,9 +183,13 @@ jobs:
         with:
           node-version: ${{ matrix.node_version }}
           registry-url: 'https://registry.npmjs.org'
+      - name: Print current dir 1
+        run: pwd
       - name: Install modules
         working-directory: ./
-        run: pnpm install
+        run: |
+          pwd
+          pnpm install
       - name: Tweak package.json
         working-directory: ./
         # This will update the package version to tag version. So artifacts uploaded to Github release will be named correctly.
@@ -230,6 +234,9 @@ jobs:
         env:
           CARGO_HOME: /github/workspace/.cargo
           RUSTUP_HOME: /github/workspace/.rustup
+
+      - name: Change permissions
+        run: chmod -R 777 /github/workspace
 
       - name: Check Rust
         run: |
