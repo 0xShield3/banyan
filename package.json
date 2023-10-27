@@ -1,6 +1,6 @@
 {
   "name": "@shield3/banyan",
-  "version": "0.1.46",
+  "version": "0.2.0",
   "description": "Banyan policy engine",
   "main": "dist/index.js",
   "scripts": {

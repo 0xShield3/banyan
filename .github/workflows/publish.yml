@@ -14,9 +14,7 @@ jobs:
         with:
           ref: ${{ github.event.release.tag_name }}
       - name: Set release version
-        # Set release version in all three os, the commented run should suffice for linux and mac.
         run: python3 -c "import os; tag = os.environ['GITHUB_REF'].split('/')[-1]; f = open(os.environ['GITHUB_ENV'], 'a'); f.write('RELEASE_VERSION='+tag); f.close();"
-        # run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: Create release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -38,9 +36,7 @@ jobs:
         with:
           ref: ${{ github.event.release.tag_name }}
       - name: Set release version
-        # Set release version in all three os, the commented run should suffice for linux and mac.
         run: python3 -c "import os; tag = os.environ['GITHUB_REF'].split('/')[-1]; f = open(os.environ['GITHUB_ENV'], 'a'); f.write('RELEASE_VERSION='+tag); f.close();"
-        # run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
       - uses: actions/setup-node@v2
         with:
@@ -66,93 +62,6 @@ jobs:
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  # nodejs-github-native:
-  #   name: nodejs-${{ matrix.node_version }}-${{ matrix.system.target }}-${{ matrix.system.os }}
-  #   runs-on: ${{ matrix.system.os }}
-  #   needs: [release]
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       node_version:
-  #         - 18
-  #         - 16
-  #       system:
-  #         - os: macos-11
-  #           target: x86_64-apple-darwin
-  #         # - os: ubuntu-20.04
-  #         #   target: x86_64-unknown-linux-gnu
-  #         - os: ubuntu-20.04
-  #           target: x86_64-unknown-linux-musl
-  #         - os: windows-2022
-  #           target: x86_64-pc-windows-msvc
-  #         # Would like to have aarch64 support, but actions does not provide these yet.
-  #         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #       with:
-  #         ref: ${{ github.event.release.tag_name }}
-  #     - name: Set release version
-  #       # Set release version in all three os, the commented run should suffice for linux and mac.
-  #       run: python3 -c "import os; tag = os.environ['GITHUB_REF'].split('/')[-1]; f = open(os.environ['GITHUB_ENV'], 'a'); f.write('RELEASE_VERSION='+tag); f.close();"
-  #       # run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-
-  #     - uses: actions/setup-node@v2
-  #       with:
-  #         node-version: ${{ matrix.node_version }}
-  #         registry-url: 'https://registry.npmjs.org'
-  #     - name: Install modules
-  #       working-directory: ./
-  #       run: npm i
-  #     - name: Tweak package.json
-  #       working-directory: ./
-  #       # This will update the package version to tag version. So artifacts uploaded to Github release will be named correctly.
-  #       run: python3 -c "import os; import json; p = json.load(open('package.json')); p['version'] = os.environ['RELEASE_VERSION']; json.dump(p, open('package.json', 'w'), indent=2, ensure_ascii=False);"
-
-  #     - name: Cache toolchain
-  #       uses: actions/cache@v1
-  #       with:
-  #         path: /usr/share/rust/.cargo
-  #         key: ${{ runner.os }}-rustup
-  #     - name: Cache cargo registry
-  #       uses: actions/cache@v1
-  #       with:
-  #         path: ~/.cargo/registry
-  #         key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.toml') }}
-  #     - name: Cache cargo index
-  #       uses: actions/cache@v1
-  #       with:
-  #         path: ~/.cargo/git
-  #         key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.toml') }}
-  #     - name: Cache cargo build	
-  #       uses: actions/cache@v1	
-  #       with:	
-  #         path: target	
-  #         key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.toml') }}
-  #     - uses: actions-rs/toolchain@v1
-  #       with:
-  #         profile: minimal
-  #         toolchain: stable
-  #         target: ${{ matrix.system.target }}
-  #         override: true
-
-  #     - name: Build native
-  #       working-directory: ./
-  #       run: npm run release-native
-  #       env:
-  #         RUSTFLAGS: "-C target-feature=-crt-static"
-  #     - name: Package the asset
-  #       working-directory: ./
-  #       # This will make a node-pre-gyp package.
-  #       run: npx node-pre-gyp package
-  #     - name: Upload to Github releases
-  #       working-directory: ./
-  #       # Use bash, even on Windows to make find available
-  #       shell: bash
-  #       # A release need to be created before upload
-  #       run: gh release upload ${{ env.RELEASE_VERSION }} "$(find ./build -name *.tar.gz)" --clobber
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   nodejs-github-lambda:
     name: nodejs-${{ matrix.node_version }}-${{ matrix.system.target }}-${{ matrix.system.os }}
@@ -215,16 +124,6 @@ jobs:
         with:	
           path: target	
           key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.toml') }}
-      # - name: Install Rust
-      #   uses: actions-rs/toolchain@v1
-      #   with:
-      #     profile: minimal
-      #     toolchain: stable
-      #     target: ${{ matrix.system.target }}
-      #     override: true
-      #   env:
-      #     CARGO_HOME: /github/workspace/.cargo
-      #     RUSTUP_HOME: /github/workspace/.rustup
       - name: Install Rust
         run: |
           export HOME=/root
@@ -233,50 +132,14 @@ jobs:
           echo "$HOME/.rustup/bin" >> $GITHUB_PATH
           # mkdir $CARGO_HOME/git
           # mkdir $CARGO_HOME/git/db
-        # env:
-        #   CARGO_HOME: /__w/.cargo
-        #   RUSTUP_HOME: /__w/.rustup
-
-      # - name: Change permissions
-      #   run: chmod -R 777 /github/workspace
 
       - name: Install Rust toolchain
         run: rustup default stable
-        # env:
-        #   CARGO_HOME: /__w/.cargo
-        #   RUSTUP_HOME: /__w/.rustup
-        # env:
-        #   CARGO_HOME: /tmp/.cargo
-        #   RUSTUP_HOME: /tmp/.rustup
 
       - name: Check Rust
         run: |
           cargo --version
           rustup --version
-        # env:
-        #   CARGO_HOME: /__w/.cargo
-        #   RUSTUP_HOME: /__w/.rustup
-
-    
-      # - name: Change owner of CARGO_HOME
-      #   run: sudo chown -R runner $CARGO_HOME
-      #   env:
-      #     CARGO_HOME: /github/workspace/.cargo
-  
-      # - name: Check CARGO_HOME permissions
-      #   run: ls -la $CARGO_HOME
-      #   env:
-      #     CARGO_HOME: /github/workspace/.cargo
-      # - name: Test cargo
-      #   working-directory: ./
-      #   run: |
-      #     whoami
-      #     pnpm run test
-      #   env:
-      #     RUST_LOG: debug
-      #     RUST_BACKTRACE: 1
-      #     CARGO_HOME: /__w/.cargo
-      #     RUSTUP_HOME: /__w/.rustup
 
       - name: Build native
         working-directory: ./
@@ -285,17 +148,12 @@ jobs:
         env:
           RUST_LOG: debug
           RUST_BACKTRACE: 1
-          # CARGO_HOME: /__w/.cargo
-          # RUSTUP_HOME: /__w/.rustup
       - name: Package the asset
         working-directory: ./
-        # This will make a node-pre-gyp package.
         run: npx node-pre-gyp package
       - name: Upload to Github releases
         working-directory: ./
-        # Use bash, even on Windows to make find available
         shell: bash
-        # A release need to be created before upload
         run: |
           git config --global --add safe.directory '*'
           gh release upload ${{ env.RELEASE_VERSION }} "$(find ./build -name *.tar.gz)" --clobber
