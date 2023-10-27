@@ -67,7 +67,7 @@ jobs:
     name: nodejs-${{ matrix.node_version }}-${{ matrix.system.target }}-${{ matrix.system.os }}
     runs-on: ${{ matrix.system.os }}
     container:
-      image: ghcr.io/ipatka/shield3-lambda-ci:latest
+      image: ghcr.io/ipatka/shield3-ci:latest
     needs: [release]
     strategy:
       fail-fast: false
