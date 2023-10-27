@@ -189,26 +189,26 @@ jobs:
         # This will update the package version to tag version. So artifacts uploaded to Github release will be named correctly.
         run: python -c "import os; import json; p = json.load(open('package.json')); p['version'] = os.environ['RELEASE_VERSION']; json.dump(p, open('package.json', 'w'), indent=2, ensure_ascii=False);"
 
-      - name: Cache toolchain
-        uses: actions/cache@v1
-        with:
-          path: /usr/share/rust/.cargo
-          key: ${{ runner.os }}-rustup
-      - name: Cache cargo registry
-        uses: actions/cache@v1
-        with:
-          path: ~/.cargo/registry
-          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.toml') }}
-      - name: Cache cargo index
-        uses: actions/cache@v1
-        with:
-          path: ~/.cargo/git
-          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.toml') }}
-      - name: Cache cargo build	
-        uses: actions/cache@v1	
-        with:	
-          path: target	
-          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.toml') }}
+      # - name: Cache toolchain
+      #   uses: actions/cache@v1
+      #   with:
+      #     path: /usr/share/rust/.cargo
+      #     key: ${{ runner.os }}-rustup
+      # - name: Cache cargo registry
+      #   uses: actions/cache@v1
+      #   with:
+      #     path: ~/.cargo/registry
+      #     key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.toml') }}
+      # - name: Cache cargo index
+      #   uses: actions/cache@v1
+      #   with:
+      #     path: ~/.cargo/git
+      #     key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.toml') }}
+      # - name: Cache cargo build	
+      #   uses: actions/cache@v1	
+      #   with:	
+      #     path: target	
+      #     key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.toml') }}
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
