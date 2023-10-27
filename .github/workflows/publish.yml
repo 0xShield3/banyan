@@ -270,7 +270,7 @@ jobs:
         working-directory: ./
         run: |
           whoami
-          cargo test
+          pnpm run test:cargo
         env:
           RUST_LOG: debug
           RUST_BACKTRACE: 1
