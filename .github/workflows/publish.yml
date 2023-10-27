@@ -227,9 +227,12 @@ jobs:
       #     RUSTUP_HOME: /github/workspace/.rustup
       - name: Install Rust
         run: |
+          export HOME=/root
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
           echo "$CARGO_HOME/bin" >> $GITHUB_PATH
           echo "$RUSTUP_HOME/bin" >> $GITHUB_PATH
+          mkdir $CARGO_HOME/git
+          mkdir $CARGO_HOME/git/db
         env:
           CARGO_HOME: /__w/.cargo
           RUSTUP_HOME: /__w/.rustup
