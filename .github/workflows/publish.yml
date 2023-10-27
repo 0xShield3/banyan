@@ -164,7 +164,6 @@ jobs:
       fail-fast: false
       matrix:
         node_version:
-          - 18
           - 16
         system:
           - os: ubuntu-20.04
@@ -210,18 +209,20 @@ jobs:
         with:	
           path: target	
           key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.toml') }}
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          target: ${{ matrix.system.target }}
-          override: true
+      # - uses: actions-rs/toolchain@v1
+      #   with:
+      #     profile: minimal
+      #     toolchain: stable
+      #     target: ${{ matrix.system.target }}
+      #     override: true
+      # - name: Install rust target
+      #   run: rustup component add ${{ matrix.system.target }}
 
       - name: Build native
         working-directory: ./
         run: npm run release-native
-        env:
-          RUSTFLAGS: "-C target-feature=-crt-static"
+        # env:
+        #   RUSTFLAGS: "-C target-feature=-crt-static"
       - name: Package the asset
         working-directory: ./
         # This will make a node-pre-gyp package.
