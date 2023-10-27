@@ -4,9 +4,9 @@
   "description": "Banyan policy engine",
   "main": "dist/index.js",
   "scripts": {
-    "build": "cargo-cp-artifact -ac  banyan_nodejs ./banyan.node -- cargo build --message-format=json-render-diagnostics",
     "build-debug": "pnpm run build --",
-    "build-release": "pnpm run build -- --release",
+    "build": "cargo-cp-artifact -ac  banyan_nodejs ./banyan.node -- cargo build --message-format=json-render-diagnostics",
+    "build-release": "cargo-cp-artifact -ac  banyan_nodejs ./banyan.node -- cargo build --message-format=json-render-diagnostics --release",
     "test:cargo": "cargo test",
     "release-native": "pnpm run build-release && rm -rf native && mkdir native && mv ./banyan.node ./native/banyan.node",
     "release-js": "npx tsc",
