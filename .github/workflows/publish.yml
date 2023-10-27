@@ -245,16 +245,18 @@ jobs:
         # env:
         #   CARGO_HOME: /tmp/.cargo
         #   RUSTUP_HOME: /tmp/.rustup
+      - name: Print current user
+        run: whoami
     
-      # - name: Change owner of CARGO_HOME
-      #   run: sudo chown -R $(whoami) $CARGO_HOME
-      #   env:
-      #     CARGO_HOME: /github/home/.cargo
+      - name: Change owner of CARGO_HOME
+        run: sudo chown -R runner $CARGO_HOME
+        env:
+          CARGO_HOME: /github/workspace/.cargo
   
-      # - name: Check CARGO_HOME permissions
-      #   run: ls -la $CARGO_HOME
-      #   env:
-      #     CARGO_HOME: /github/home/.cargo  # Replace with your CARGO_HOME path
+      - name: Check CARGO_HOME permissions
+        run: ls -la $CARGO_HOME
+        env:
+          CARGO_HOME: /github/workspace/.cargo
 
       - name: Build native
         working-directory: ./
