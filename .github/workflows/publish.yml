@@ -262,10 +262,10 @@ jobs:
         env:
           CARGO_HOME: /github/workspace/.cargo
   
-      - name: Check CARGO_HOME permissions
-        run: ls -la $CARGO_HOME
-        env:
-          CARGO_HOME: /github/workspace/.cargo
+      # - name: Check CARGO_HOME permissions
+      #   run: ls -la $CARGO_HOME
+      #   env:
+      #     CARGO_HOME: /github/workspace/.cargo
 
       - name: Build native
         working-directory: ./
