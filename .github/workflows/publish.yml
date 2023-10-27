@@ -256,8 +256,6 @@ jobs:
         # env:
         #   CARGO_HOME: /tmp/.cargo
         #   RUSTUP_HOME: /tmp/.rustup
-      - name: Print current user
-        run: whoami
     
       # - name: Change owner of CARGO_HOME
       #   run: sudo chown -R runner $CARGO_HOME
@@ -268,26 +266,36 @@ jobs:
       #   run: ls -la $CARGO_HOME
       #   env:
       #     CARGO_HOME: /github/workspace/.cargo
-
-      - name: Build native
+      - name: Test cargo
         working-directory: ./
         run: |
           whoami
-          pnpm run release-native
+          cargo test
         env:
           RUST_LOG: debug
           RUST_BACKTRACE: 1
           CARGO_HOME: /__w/.cargo
           RUSTUP_HOME: /__w/.rustup
-      - name: Package the asset
-        working-directory: ./
-        # This will make a node-pre-gyp package.
-        run: npx node-pre-gyp package
-      - name: Upload to Github releases
-        working-directory: ./
-        # Use bash, even on Windows to make find available
-        shell: bash
-        # A release need to be created before upload
-        run: gh release upload ${{ env.RELEASE_VERSION }} "$(find ./build -name *.tar.gz)" --clobber
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # - name: Build native
+      #   working-directory: ./
+      #   run: |
+      #     whoami
+      #     pnpm run release-native
+      #   env:
+      #     RUST_LOG: debug
+      #     RUST_BACKTRACE: 1
+      #     CARGO_HOME: /__w/.cargo
+      #     RUSTUP_HOME: /__w/.rustup
+      # - name: Package the asset
+      #   working-directory: ./
+      #   # This will make a node-pre-gyp package.
+      #   run: npx node-pre-gyp package
+      # - name: Upload to Github releases
+      #   working-directory: ./
+      #   # Use bash, even on Windows to make find available
+      #   shell: bash
+      #   # A release need to be created before upload
+      #   run: gh release upload ${{ env.RELEASE_VERSION }} "$(find ./build -name *.tar.gz)" --clobber
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
