@@ -216,18 +216,16 @@ jobs:
           toolchain: stable
           target: ${{ matrix.system.target }}
           override: true
-        # env:
-        #   CARGO_HOME: /root/.cargo
-        #   RUSTUP_HOME: /root/.rustup
-      # - name: Install rust target
-      #   run: rustup component add ${{ matrix.system.target }}
+        env:
+          CARGO_HOME: /github/workspace/.cargo
+          RUSTUP_HOME: /github/workspace/.rustup
 
       - name: Build native
         working-directory: ./
         run: npm run release-native
-        # env:
-        #   CARGO_HOME: /root/.cargo
-        #   RUSTUP_HOME: /root/.rustup
+        env:
+          CARGO_HOME: /github/workspace/.cargo
+          RUSTUP_HOME: /github/workspace/.rustup
         # env:
         #   RUSTFLAGS: "-C target-feature=-crt-static"
       - name: Package the asset
