@@ -195,26 +195,26 @@ jobs:
         # This will update the package version to tag version. So artifacts uploaded to Github release will be named correctly.
         run: python -c "import os; import json; p = json.load(open('package.json')); p['version'] = os.environ['RELEASE_VERSION']; json.dump(p, open('package.json', 'w'), indent=2, ensure_ascii=False);"
 
-      # - name: Cache toolchain
-      #   uses: actions/cache@v1
-      #   with:
-      #     path: /usr/share/rust/.cargo
-      #     key: ${{ runner.os }}-rustup
-      # - name: Cache cargo registry
-      #   uses: actions/cache@v1
-      #   with:
-      #     path: ~/.cargo/registry
-      #     key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.toml') }}
-      # - name: Cache cargo index
-      #   uses: actions/cache@v1
-      #   with:
-      #     path: ~/.cargo/git
-      #     key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.toml') }}
-      # - name: Cache cargo build	
-      #   uses: actions/cache@v1	
-      #   with:	
-      #     path: target	
-      #     key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.toml') }}
+      - name: Cache toolchain
+        uses: actions/cache@v1
+        with:
+          path: ~/.cargo
+          key: ${{ runner.os }}-rustup
+      - name: Cache cargo registry
+        uses: actions/cache@v1
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.toml') }}
+      - name: Cache cargo index
+        uses: actions/cache@v1
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.toml') }}
+      - name: Cache cargo build	
+        uses: actions/cache@v1	
+        with:	
+          path: target	
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.toml') }}
       # - name: Install Rust
       #   uses: actions-rs/toolchain@v1
       #   with:
@@ -229,13 +229,13 @@ jobs:
         run: |
           export HOME=/root
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          echo "$CARGO_HOME/bin" >> $GITHUB_PATH
-          echo "$RUSTUP_HOME/bin" >> $GITHUB_PATH
-          mkdir $CARGO_HOME/git
-          mkdir $CARGO_HOME/git/db
-        env:
-          CARGO_HOME: /__w/.cargo
-          RUSTUP_HOME: /__w/.rustup
+          # echo "$CARGO_HOME/bin" >> $GITHUB_PATH
+          # echo "$RUSTUP_HOME/bin" >> $GITHUB_PATH
+          # mkdir $CARGO_HOME/git
+          # mkdir $CARGO_HOME/git/db
+        # env:
+        #   CARGO_HOME: /__w/.cargo
+        #   RUSTUP_HOME: /__w/.rustup
 
       # - name: Change permissions
       #   run: chmod -R 777 /github/workspace
@@ -244,15 +244,15 @@ jobs:
         run: |
           cargo --version
           rustup --version
-        env:
-          CARGO_HOME: /__w/.cargo
-          RUSTUP_HOME: /__w/.rustup
+        # env:
+        #   CARGO_HOME: /__w/.cargo
+        #   RUSTUP_HOME: /__w/.rustup
 
       - name: Install Rust toolchain
         run: rustup default stable
-        env:
-          CARGO_HOME: /__w/.cargo
-          RUSTUP_HOME: /__w/.rustup
+        # env:
+        #   CARGO_HOME: /__w/.cargo
+        #   RUSTUP_HOME: /__w/.rustup
         # env:
         #   CARGO_HOME: /tmp/.cargo
         #   RUSTUP_HOME: /tmp/.rustup
@@ -280,13 +280,12 @@ jobs:
       - name: Build native
         working-directory: ./
         run: |
-          whoami
           pnpm run release-native
         env:
           RUST_LOG: debug
           RUST_BACKTRACE: 1
-          CARGO_HOME: /__w/.cargo
-          RUSTUP_HOME: /__w/.rustup
+          # CARGO_HOME: /__w/.cargo
+          # RUSTUP_HOME: /__w/.rustup
       - name: Package the asset
         working-directory: ./
         # This will make a node-pre-gyp package.
