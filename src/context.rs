@@ -1,3 +1,4 @@
+use crate::MyError;
 use cedar_policy::{
     Authorizer, Context, Decision, Entities, EntityUid, Policy, PolicySet, Request, Response,
     Schema, SchemaFragment, ValidationMode, ValidationResult, Validator,
@@ -5,7 +6,28 @@ use cedar_policy::{
 use serde_json::Value;
 use std::collections::HashMap;
 use std::str::FromStr;
-use crate::MyError;
+
+use serde::Serialize;
+
+#[derive(Serialize)]
+pub enum PolicyDecision {
+    Allow,
+    Deny,
+}
+
+#[derive(Serialize)]
+pub struct IPolicyStatementResult {
+    policy_id: String,
+    invoked: bool,
+    annotations: HashMap<String, String>,
+}
+
+#[derive(Serialize)]
+pub struct IPolicyEnginePolicyResponse {
+    reasons: Vec<IPolicyStatementResult>,
+    decision: PolicyDecision,
+    errors: Vec<String>,
+}
 
 pub fn validate_policy(
     policy: &str,
@@ -44,19 +66,29 @@ pub fn is_authorized(
     policy: &str,
     entities: &str,
     context: &Value,
-) -> Result<HashMap<String, HashMap<String, String>>, MyError> {
-    let p: EntityUid = principal.to_string().parse().map_err(|_| MyError::InvalidPayload)?;
-    let a = action.to_string().parse().map_err(|_| MyError::InvalidPayload)?;
-    let r = resource.to_string().parse().map_err(|_| MyError::InvalidPayload)?;
+) -> Result<IPolicyEnginePolicyResponse, MyError> {
+    let p: EntityUid = principal
+        .to_string()
+        .parse()
+        .map_err(|_| MyError::InvalidPayload)?;
+    let a = action
+        .to_string()
+        .parse()
+        .map_err(|_| MyError::InvalidPayload)?;
+    let r = resource
+        .to_string()
+        .parse()
+        .map_err(|_| MyError::InvalidPayload)?;
 
     let ent = Entities::from_json_str(entities, None).map_err(|_| MyError::InvalidPayload)?;
-    let cont = Context::from_json_value(context.clone(), None).map_err(|_| MyError::InvalidPayload)?;
+    let cont =
+        Context::from_json_value(context.clone(), None).map_err(|_| MyError::InvalidPayload)?;
     let policy_set = PolicySet::from_str(policy).map_err(|_| MyError::InvalidPayload)?;
 
     let request = Request::new(Some(p), Some(a), Some(r), cont);
     let ans = execute_query(&request, &policy_set, ent);
     print_answer(&ans, &policy_set);
-    Ok(format_answer(&ans, &policy_set))
+    format_answer(&ans, &policy_set)
 }
 
 fn execute_query(request: &Request, policies: &PolicySet, entities: Entities) -> Response {
@@ -78,37 +110,46 @@ fn print_answer(response: &Response, policies: &PolicySet) {
     println!("------------------\n");
 }
 
-fn format_answer(
+pub fn format_answer(
     response: &Response,
     policies: &PolicySet,
-) -> HashMap<String, HashMap<String, String>> {
-    let mut result = HashMap::new();
+) -> Result<IPolicyEnginePolicyResponse, MyError> {
+    let mut reasons = Vec::new();
+    let mut errors = Vec::new();
+
     for policy in policies.policies() {
         let mut attrs = HashMap::new();
         for (key, value) in policy.annotations() {
             attrs.insert(key.to_string(), value.to_string());
         }
-        if response
+
+        let invoked = response
             .diagnostics()
             .reason()
-            .any(|reason| *reason == *policy.id())
-        {
-            attrs.insert("reason".to_string(), true.to_string());
-        } else {
-            attrs.insert("reason".to_string(), false.to_string());
-        }
+            .any(|reason| *reason == *policy.id());
 
-        match response.decision() {
-            Decision::Allow => {
-                attrs.insert("decision".to_string(), "allow".to_string());
-            }
-            Decision::Deny => {
-                attrs.insert("decision".to_string(), "deny".to_string());
-            }
-        }
-        result.insert(policy.id().to_string(), attrs);
+        reasons.push(IPolicyStatementResult {
+            policy_id: policy.id().to_string(),
+            invoked,
+            annotations: attrs,
+        });
     }
-    result
+
+    let decision = match response.decision() {
+        Decision::Allow => PolicyDecision::Allow,
+        Decision::Deny => PolicyDecision::Deny,
+    };
+
+    // Add errors from diagnostics to the errors vector
+    for error in response.diagnostics().errors() {
+        errors.push(error.to_string());
+    }
+
+    Ok(IPolicyEnginePolicyResponse {
+        reasons,
+        decision,
+        errors,
+    })
 }
 
 pub fn to_json(policy: &str) -> Result<Value, Box<dyn std::error::Error>> {

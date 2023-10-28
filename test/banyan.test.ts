@@ -1,5 +1,5 @@
 import chai from 'chai'
-import { invoke, invokePolicyEngine } from '../index'
+import { PolicyDecision, invoke, invokePolicyEngine } from '../index'
 const { assert } = chai
 
 import AllowRequest from './examples/erc20_limit_allow.json'
@@ -18,14 +18,12 @@ describe('Tests on Banyan', () => {
     it('Allows something', async () => {
         const result = invokePolicyEngine(AllowRequest)
         console.log({ result })
-        expect(result.result['policy0'].reason).toBe('true')
-        expect(result.result['policy1'].reason).toBe('false')
+        expect(result.decision).toBe(PolicyDecision.ALLOW)
     })
 
     it('Denies something', async () => {
         const result = invokePolicyEngine(DenyRequest)
         console.log({ result })
-        expect(result.result['policy0'].reason).toBe('false')
-        expect(result.result['policy1'].reason).toBe('true')
+        expect(result.decision).toBe(PolicyDecision.DENY)
     })
 })

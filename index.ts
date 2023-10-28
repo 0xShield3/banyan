@@ -31,30 +31,29 @@ export interface IPolicyEngineInvokePayload {
 	schema: string | undefined
 }
 export enum TriggeredPolicyAction {
-	BLOCK = 'Block',
 	MFA = 'MFA',
-	NOTIFY = 'Notify',
-	ALLOW = 'Allow'
+	NOTIFY = 'Notify'
 }
 
 export enum PolicyDecision {
-	ALLOW = 'allow',
-	DENY = 'deny'
+	ALLOW = 'Allow',
+	DENY = 'Deny'
 }
+
+export interface IPolicyStatementResult{
+	name?: string
+	message?: string
+	action?: TriggeredPolicyAction
+	invoked: boolean
+}
+
 
 export interface IPolicyEnginePolicyResponse {
-	action?: TriggeredPolicyAction
-	name?: string
+	reasons: IPolicyStatementResult[]
 	decision: PolicyDecision
-	reason: 'true' | 'false'
-	message?: string
+	errors: string[]
 }
 
-export interface IPolicyEngineInvokeResponse {
-	result: {
-		[key: string]: IPolicyEnginePolicyResponse
-	}
-}
 
 export const Banyan = {
   test: 'test'
@@ -70,7 +69,7 @@ export const isAuthorized = (request: string) => {
   return authorize(request);
 }
 
-export const parsePolicyEngineResponsePayload = (response: any): IPolicyEngineInvokeResponse | null => {
+export const parsePolicyEngineResponsePayload = (response: any): IPolicyEnginePolicyResponse | null => {
 	try {
 		const parsedResponse = JSON.parse(response)
     return parsedResponse
@@ -87,7 +86,7 @@ export const parsePolicyEngineResponsePayload = (response: any): IPolicyEngineIn
 	}
 }
 
-export const invokePolicyEngine = (request: IPolicyEngineInvokePayload): IPolicyEngineInvokeResponse => {
+export const invokePolicyEngine = (request: IPolicyEngineInvokePayload): IPolicyEnginePolicyResponse => {
   console.log('invokePolicyEngine');
   const result = isAuthorized(JSON.stringify(request));
   const parsed = parsePolicyEngineResponsePayload(result);
