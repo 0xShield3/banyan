@@ -51,10 +51,9 @@ export enum PolicyDecision {
 }
 
 export interface IPolicyStatementResult {
-    name?: string
-    message?: string
-    action?: TriggeredPolicyAction
+    policy_id: string
     invoked: boolean
+    annotations: {[key: string]: string}
 }
 
 export interface IPolicyEnginePolicyResponse {

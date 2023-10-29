@@ -8,13 +8,13 @@ import DenyRequest from './examples/erc20_limit_deny.json'
 describe('Tests on Banyan', () => {
     it('Allows something', () => {
         const result = invokePolicyEngine(AllowRequest)
-        console.log({ result })
+        console.log(JSON.stringify(result, null, 2))
         expect(result.decision).toBe(PolicyDecision.ALLOW)
     })
 
     it('Denies something', () => {
         const result = invokePolicyEngine(DenyRequest)
-        console.log({ result })
+        console.log(JSON.stringify(result, null, 2))
         expect(result.decision).toBe(PolicyDecision.DENY)
     })
     
