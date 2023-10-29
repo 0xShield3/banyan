@@ -3,7 +3,7 @@ use cedar_policy::{
     Authorizer, Context, Decision, Entities, EntityUid, Policy, PolicySet, Request, Response,
     Schema, SchemaFragment, ValidationMode, ValidationResult, Validator,
 };
-use serde_json::Value;
+use serde_json::{json, Value};
 use std::collections::HashMap;
 use std::str::FromStr;
 
@@ -32,7 +32,7 @@ pub struct IPolicyEnginePolicyResponse {
 pub fn validate_policy(
     policy: &str,
     additional_schema_fragments: Option<Vec<&str>>,
-) -> Result<(), Box<dyn std::error::Error>> {
+) -> Result<Value, Box<dyn std::error::Error>> {
     let schema_file = include_str!("../resource/policySchema.json");
     let schema_a: SchemaFragment = SchemaFragment::from_str(schema_file)?;
     let mut schema_fragments = vec![schema_a];
@@ -50,7 +50,7 @@ pub fn validate_policy(
     let p = PolicySet::from_str(&policy)?;
     let result = Validator::validate(&validator, &p, ValidationMode::default());
     if ValidationResult::validation_passed(&result) {
-        return Ok(());
+        return Ok(json!({ "valid": true }));
     } else {
         let e = ValidationResult::validation_errors(&result);
         let a = e.map(|e| e.to_string()).collect::<Vec<_>>().join("\n ");
@@ -152,9 +152,16 @@ pub fn format_answer(
     })
 }
 
-pub fn to_json(policy: &str) -> Result<Value, Box<dyn std::error::Error>> {
-    let p = Policy::from_str(&policy)?;
-    let result = Policy::to_json(&p).map_err(|e| e.into());
-    println!("result: {:?}", result);
-    result
+pub fn to_json(policy: &str) -> Result<Vec<Value>, Box<dyn std::error::Error>> {
+    let policy_set = PolicySet::from_str(policy).map_err(|_| MyError::InvalidPayload)?;
+    let mut policy_set_json = Vec::<Value>::new();
+
+    for policy in policy_set.policies() {
+        let policy_json: Result<Value, Box<dyn std::error::Error>> =
+            Policy::to_json(&policy).map_err(|e| e.into());
+
+        policy_set_json.push(policy_json?);
+    }
+    println!("result: {:?}", policy_set_json);
+    Ok(policy_set_json)
 }
