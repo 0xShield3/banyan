@@ -4,7 +4,7 @@ import { resolve, join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import Ajv from 'ajv'
 
-import PolicyEngineResponse from './schemas/IPolicyEnginePolicyResponse'
+import schema_IPolicyEnginePolicyResponse from './schemas/schema_IPolicyEnginePolicyResponse'
 
 // Native modules are not currently supported with ES module imports.
 // https://nodejs.org/api/esm.html#esm_no_native_module_loading
@@ -87,7 +87,7 @@ export const isAuthorized = (request: string) => {
 
 export function validatePolicyEngineResponse(maybePolicyEngineResponse: any) {
     const ajv = new Ajv()
-    const validate = ajv.compile(PolicyEngineResponse)
+    const validate = ajv.compile(schema_IPolicyEnginePolicyResponse)
     return validate(maybePolicyEngineResponse)
 }
 
