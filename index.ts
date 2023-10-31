@@ -4,7 +4,7 @@ import { resolve, join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import Ajv from 'ajv'
 
-import PolicyEngineResponse from './schemas/IPolicyEnginePolicyResponse.json'
+import PolicyEngineResponse from './schemas/IPolicyEnginePolicyResponse'
 
 // Native modules are not currently supported with ES module imports.
 // https://nodejs.org/api/esm.html#esm_no_native_module_loading

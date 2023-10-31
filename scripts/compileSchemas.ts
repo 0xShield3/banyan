@@ -25,7 +25,8 @@ const generate = async () => {
 		// Get symbols for different types from generator.
 		const schema = generator.getSchemaForSymbol(symbol)
 
-		writeFileSync(join(outputPath, `${symbol}.json`), JSON.stringify(schema))
+		writeFileSync(join(outputPath, `${symbol}.ts`), `export default ${JSON.stringify(schema, null, 2)}`)
+
 	}
 }
 generate()
