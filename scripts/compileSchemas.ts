@@ -1,4 +1,4 @@
-import { writeFileSync } from 'fs'
+import { writeFileSync, appendFileSync } from 'fs'
 import { join, resolve } from 'path'
 import * as TJS from 'typescript-json-schema'
 
@@ -9,6 +9,8 @@ const generate = async () => {
 
 	const tsConfigPath = resolve('tsconfig.json')
 	const outputPath = resolve('schemas/')
+	const indexFilePath = resolve('index.ts')
+
 
 	// const program = TJS.getProgramFromFiles([resolve('services/utils/Interfaces/CommandCenter/IPolicies.ts')])
 	const includePaths = [
@@ -25,7 +27,8 @@ const generate = async () => {
 		// Get symbols for different types from generator.
 		const schema = generator.getSchemaForSymbol(symbol)
 
-		writeFileSync(join(outputPath, `schema_${symbol}.ts`), `export default ${JSON.stringify(schema, null, 2)}`)
+		appendFileSync(indexFilePath, `\nexport const ${symbol}Schema = ${JSON.stringify(schema, null, 2)}\n`)
+
 
 	}
 }

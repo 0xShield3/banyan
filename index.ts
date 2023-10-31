@@ -4,8 +4,6 @@ import { resolve, join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import Ajv from 'ajv'
 
-import schema_IPolicyEnginePolicyResponse from './schemas/schema_IPolicyEnginePolicyResponse'
-
 // Native modules are not currently supported with ES module imports.
 // https://nodejs.org/api/esm.html#esm_no_native_module_loading
 import { createRequire } from 'module'
@@ -87,7 +85,7 @@ export const isAuthorized = (request: string) => {
 
 export function validatePolicyEngineResponse(maybePolicyEngineResponse: any) {
     const ajv = new Ajv()
-    const validate = ajv.compile(schema_IPolicyEnginePolicyResponse)
+    const validate = ajv.compile(IPolicyEnginePolicyResponseSchema)
     return validate(maybePolicyEngineResponse)
 }
 
@@ -126,4 +124,62 @@ export const validatePolicy = (request: IValidatePolicyPayload): any => {
     const result = validate_policy(JSON.stringify(request))
     const parsedResponse = JSON.parse(result) // TODO validate
     return parsedResponse
+}
+
+export const IPolicyEnginePolicyResponseSchema = {
+  "type": "object",
+  "properties": {
+    "reasons": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/IPolicyStatementResult"
+      }
+    },
+    "decision": {
+      "$ref": "#/definitions/PolicyDecision"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "decision",
+    "errors",
+    "reasons"
+  ],
+  "definitions": {
+    "IPolicyStatementResult": {
+      "type": "object",
+      "properties": {
+        "policy_id": {
+          "type": "string"
+        },
+        "invoked": {
+          "type": "boolean"
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "annotations",
+        "invoked",
+        "policy_id"
+      ]
+    },
+    "PolicyDecision": {
+      "enum": [
+        "Allow",
+        "Deny"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
 }
