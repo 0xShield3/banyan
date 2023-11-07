@@ -253,6 +253,7 @@ jobs:
           
   nodejs-github-native:
     name: nodejs-${{ matrix.node_version }}-${{ matrix.system.target }}-${{ matrix.system.os }}
+    needs: [release]
     runs-on: ${{ matrix.system.os }}
     strategy:
       fail-fast: false
