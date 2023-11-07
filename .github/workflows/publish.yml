@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     # Prevent a situation where native build fails and a npm package is uploaded.
     # needs: [nodejs-github-native]
-    needs: [nodejs-github-lambda-16, nodejs-github-lambda-18]
+    needs: [nodejs-github-lambda-16, nodejs-github-lambda-18, nodejs-github-native]
     steps:
       - uses: actions/checkout@v2
         with:
