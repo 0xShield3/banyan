@@ -312,12 +312,6 @@ jobs:
         with:	
           path: target	
           key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.toml') }}
-      - name: Install Rust
-        run: |
-          export HOME=/root
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-          echo "$HOME/.rustup/bin" >> $GITHUB_PATH
 
       - name: Install Rust toolchain
         run: rustup default stable
