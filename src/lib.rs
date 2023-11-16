@@ -98,7 +98,7 @@ fn authorize(mut cx: FunctionContext) -> JsResult<JsString> {
         &context_value,
     ) {
         Ok(v) => v,
-        Err(_) => return cx.throw_error("Authorization failed"),
+        Err(e) => return cx.throw_error(format!("Authorization failed: {}", e)),
     };
 
     let result = json!(answer);
@@ -121,7 +121,7 @@ fn policy_from_json(mut cx: FunctionContext) -> JsResult<JsString> {
 
     let answer = match context::from_json(policies) {
         Ok(v) => v,
-        Err(_) => return cx.throw_error("JSON conversion failed"),
+        Err(e) => return cx.throw_error(format!("From JSON conversion failed: {}", e)),
     };
 
     Ok(cx.string(answer))
@@ -135,7 +135,7 @@ fn policy_to_json(mut cx: FunctionContext) -> JsResult<JsString> {
 
     let answer = match context::to_json(&payload_string) {
         Ok(v) => v,
-        Err(_) => return cx.throw_error("JSON conversion failed"),
+        Err(e) => return cx.throw_error(format!("To JSON conversion failed: {}", e)),
     };
 
     let result = json!(answer);

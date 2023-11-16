@@ -165,15 +165,29 @@ pub fn to_json(policy: &str) -> Result<Vec<Value>, Box<dyn std::error::Error>> {
     println!("result: {:?}", policy_set_json);
     Ok(policy_set_json)
 }
+// pub fn from_json(policies: Vec<Value>) -> Result<String, Box<dyn std::error::Error>> {
+//     let mut policy_set = PolicySet::new();
+
+//     for (id, policy_json) in policies.into_iter().enumerate() {
+//         let policy_id_str = format!("policy{}", id);
+//         let policy_id = PolicyId::from_str(&policy_id_str)?;
+//         let policy = Policy::from_json(Some(policy_id), policy_json)?;
+//         // let policy = Policy::from_json(None, policy_json)?;
+//         policy_set.add(policy)?;
+//     }
+
+//     Ok(policy_set.to_string())
+// }
+
 pub fn from_json(policies: Vec<Value>) -> Result<String, Box<dyn std::error::Error>> {
-    let mut policy_set = PolicySet::new();
+    let mut policy_strings = Vec::new();
 
     for (id, policy_json) in policies.into_iter().enumerate() {
         let policy_id_str = format!("policy{}", id);
         let policy_id = PolicyId::from_str(&policy_id_str)?;
         let policy = Policy::from_json(Some(policy_id), policy_json)?;
-        policy_set.add(policy)?;
+        policy_strings.push(policy.to_string());
     }
 
-    Ok(policy_set.to_string())
+    Ok(policy_strings.join("\n"))
 }
