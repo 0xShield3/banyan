@@ -33,16 +33,36 @@ fn get_field(cx: &mut FunctionContext, payload: Value, field: &str) -> NeonResul
     }
 }
 
-fn get_field_array(cx: &mut FunctionContext, payload: Value, field: &str) -> NeonResult<Vec<String>> {
+fn get_field_array(
+    cx: &mut FunctionContext,
+    payload: Value,
+    field: &str,
+) -> NeonResult<Vec<String>> {
     match payload[field].as_array() {
-        Some(arr) => Ok(arr.iter().map(|v| v.as_str().unwrap_or("").to_string()).collect()),
+        Some(arr) => Ok(arr
+            .iter()
+            .map(|v| v.as_str().unwrap_or("").to_string())
+            .collect()),
+        None => cx.throw_error(format!("Missing field: {}", field)),
+    }
+}
+
+fn get_field_array_json(
+    cx: &mut FunctionContext,
+    payload: Value,
+    field: &str,
+) -> NeonResult<Vec<Value>> {
+    match payload[field].as_array() {
+        Some(arr) => Ok(arr.clone()),
         None => cx.throw_error(format!("Missing field: {}", field)),
     }
 }
 
 fn authorize(mut cx: FunctionContext) -> JsResult<JsString> {
     let payload: Handle<JsValue> = cx.argument(0)?;
-    let payload_string = payload.downcast_or_throw::<JsString, _>(&mut cx)?.value(&mut cx);
+    let payload_string = payload
+        .downcast_or_throw::<JsString, _>(&mut cx)?
+        .value(&mut cx);
     let payload: Value = match serde_json::from_str(&payload_string) {
         Ok(v) => v,
         Err(_) => return cx.throw_error("Failed to parse JSON"),
@@ -68,7 +88,7 @@ fn authorize(mut cx: FunctionContext) -> JsResult<JsString> {
     {
         return cx.throw_error("Invalid payload");
     }
-    
+
     let answer = match context::is_authorized(
         &principal,
         &action,
@@ -86,10 +106,33 @@ fn authorize(mut cx: FunctionContext) -> JsResult<JsString> {
     Ok(cx.string(result_string))
 }
 
+fn policy_from_json(mut cx: FunctionContext) -> JsResult<JsString> {
+    let payload: Handle<JsValue> = cx.argument(0)?;
+    let payload_string = payload
+        .downcast_or_throw::<JsString, _>(&mut cx)?
+        .value(&mut cx);
+
+    let payload: Value = match serde_json::from_str(&payload_string) {
+        Ok(v) => v,
+        Err(_) => return cx.throw_error("Failed to parse JSON"),
+    };
+
+    let policies = get_field_array_json(&mut cx, payload.clone(), "policies")?;
+
+    let answer = match context::from_json(policies) {
+        Ok(v) => v,
+        Err(_) => return cx.throw_error("JSON conversion failed"),
+    };
+
+    Ok(cx.string(answer))
+}
+
 fn policy_to_json(mut cx: FunctionContext) -> JsResult<JsString> {
     let payload: Handle<JsValue> = cx.argument(0)?;
-    let payload_string = payload.downcast_or_throw::<JsString, _>(&mut cx)?.value(&mut cx);
-    
+    let payload_string = payload
+        .downcast_or_throw::<JsString, _>(&mut cx)?
+        .value(&mut cx);
+
     let answer = match context::to_json(&payload_string) {
         Ok(v) => v,
         Err(_) => return cx.throw_error("JSON conversion failed"),
@@ -102,25 +145,28 @@ fn policy_to_json(mut cx: FunctionContext) -> JsResult<JsString> {
 
 fn validate_policy(mut cx: FunctionContext) -> JsResult<JsString> {
     let payload: Handle<JsValue> = cx.argument(0)?;
-    let payload_string = payload.downcast_or_throw::<JsString, _>(&mut cx)?.value(&mut cx);
+    let payload_string = payload
+        .downcast_or_throw::<JsString, _>(&mut cx)?
+        .value(&mut cx);
     let payload: Value = match serde_json::from_str(&payload_string) {
         Ok(v) => v,
         Err(_) => return cx.throw_error("Failed to parse JSON"),
     };
 
     let policy = get_field(&mut cx, payload.clone(), "policy")?;
-    let additional_schema_fragments = get_field_array(&mut cx, payload.clone(), "additional_schema_fragments")?;
+    let additional_schema_fragments =
+        get_field_array(&mut cx, payload.clone(), "additional_schema_fragments")?;
 
-    let additional_schema_fragments_str: Vec<&str> = additional_schema_fragments.iter().map(AsRef::as_ref).collect();
+    let additional_schema_fragments_str: Vec<&str> = additional_schema_fragments
+        .iter()
+        .map(AsRef::as_ref)
+        .collect();
 
     if policy.to_string().trim().is_empty() {
         return cx.throw_error("Invalid payload");
     }
-    
-    let answer = match context::validate_policy(
-        &policy,
-        Some(additional_schema_fragments_str),
-    ) {
+
+    let answer = match context::validate_policy(&policy, Some(additional_schema_fragments_str)) {
         Ok(v) => v,
         Err(_) => return cx.throw_error("Validation failed"),
     };
@@ -135,6 +181,7 @@ fn main(mut cx: ModuleContext) -> NeonResult<()> {
     cx.export_function("hello", hello)?;
     cx.export_function("authorize", authorize)?;
     cx.export_function("policy_to_json", policy_to_json)?;
+    cx.export_function("policy_from_json", policy_from_json)?;
     cx.export_function("validate_policy", validate_policy)?;
     Ok(())
 }

@@ -1,5 +1,5 @@
-import { writeFileSync, appendFileSync } from 'fs'
-import { join, resolve } from 'path'
+import { appendFileSync } from 'fs'
+import { resolve } from 'path'
 import * as TJS from 'typescript-json-schema'
 
 const generate = async () => {

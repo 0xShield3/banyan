@@ -17,6 +17,7 @@ const {
     hello,
     authorize,
     policy_to_json,
+    policy_from_json,
     validate_policy,
     // the file will be run in ./dist, so popd.
 } = require(find(resolve(join(__dirname, process.env.dev ? '' : '..', './package.json'))))
@@ -51,7 +52,7 @@ export enum PolicyDecision {
 export interface IPolicyStatementResult {
     policy_id: string
     invoked: boolean
-    annotations: {[key: string]: string}
+    annotations: { [key: string]: string }
 }
 
 export interface IPolicyEnginePolicyResponse {
@@ -72,6 +73,8 @@ export interface IPolicyJSON {
 }
 
 export type PolicyToJSONResponse = IPolicyJSON[]
+
+export type PolicyFromJSONRequest = { policies: IPolicyJSON[] }
 
 export const invoke = () => {
     console.log('hello')
@@ -112,6 +115,12 @@ export const invokePolicyEngine = (request: IPolicyEngineInvokePayload): IPolicy
     return parsed
 }
 
+export const policyFromJson = (request: PolicyFromJSONRequest): string => {
+    console.log('policyFromJson')
+    const result = policy_from_json(JSON.stringify(request))
+    return result
+}
+
 export const policyToJson = (policy: string): PolicyToJSONResponse => {
     console.log('policyToJson')
     const result = policy_to_json(policy)
@@ -127,59 +136,48 @@ export const validatePolicy = (request: IValidatePolicyPayload): any => {
 }
 
 export const IPolicyEnginePolicyResponseSchema = {
-  "type": "object",
-  "properties": {
-    "reasons": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/IPolicyStatementResult"
-      }
-    },
-    "decision": {
-      "$ref": "#/definitions/PolicyDecision"
-    },
-    "errors": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    }
-  },
-  "required": [
-    "decision",
-    "errors",
-    "reasons"
-  ],
-  "definitions": {
-    "IPolicyStatementResult": {
-      "type": "object",
-      "properties": {
-        "policy_id": {
-          "type": "string"
+    type: 'object',
+    properties: {
+        reasons: {
+            type: 'array',
+            items: {
+                $ref: '#/definitions/IPolicyStatementResult',
+            },
         },
-        "invoked": {
-          "type": "boolean"
+        decision: {
+            $ref: '#/definitions/PolicyDecision',
         },
-        "annotations": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      },
-      "required": [
-        "annotations",
-        "invoked",
-        "policy_id"
-      ]
+        errors: {
+            type: 'array',
+            items: {
+                type: 'string',
+            },
+        },
     },
-    "PolicyDecision": {
-      "enum": [
-        "Allow",
-        "Deny"
-      ],
-      "type": "string"
-    }
-  },
-  "$schema": "http://json-schema.org/draft-07/schema#"
+    required: ['decision', 'errors', 'reasons'],
+    definitions: {
+        IPolicyStatementResult: {
+            type: 'object',
+            properties: {
+                policy_id: {
+                    type: 'string',
+                },
+                invoked: {
+                    type: 'boolean',
+                },
+                annotations: {
+                    type: 'object',
+                    additionalProperties: {
+                        type: 'string',
+                    },
+                },
+            },
+            required: ['annotations', 'invoked', 'policy_id'],
+        },
+        PolicyDecision: {
+            enum: ['Allow', 'Deny'],
+            type: 'string',
+        },
+    },
+    $schema: 'http://json-schema.org/draft-07/schema#',
 }

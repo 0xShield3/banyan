@@ -1,7 +1,7 @@
 use crate::MyError;
 use cedar_policy::{
-    Authorizer, Context, Decision, Entities, EntityUid, Policy, PolicySet, Request, Response,
-    Schema, SchemaFragment, ValidationMode, ValidationResult, Validator,
+    Authorizer, Context, Decision, Entities, EntityUid, Policy, PolicyId, PolicySet, Request,
+    Response, Schema, SchemaFragment, ValidationMode, ValidationResult, Validator,
 };
 use serde_json::{json, Value};
 use std::collections::HashMap;
@@ -164,4 +164,16 @@ pub fn to_json(policy: &str) -> Result<Vec<Value>, Box<dyn std::error::Error>> {
     }
     println!("result: {:?}", policy_set_json);
     Ok(policy_set_json)
+}
+pub fn from_json(policies: Vec<Value>) -> Result<String, Box<dyn std::error::Error>> {
+    let mut policy_set = PolicySet::new();
+
+    for (id, policy_json) in policies.into_iter().enumerate() {
+        let policy_id_str = format!("policy{}", id);
+        let policy_id = PolicyId::from_str(&policy_id_str)?;
+        let policy = Policy::from_json(Some(policy_id), policy_json)?;
+        policy_set.add(policy)?;
+    }
+
+    Ok(policy_set.to_string())
 }
